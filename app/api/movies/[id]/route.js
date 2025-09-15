@@ -2,9 +2,9 @@ import { cookies } from 'next/headers'
 const API_BASE = process.env.API_BASE ?? 'https://movie-api-decs.onrender.com/api'
 
 export async function GET(_request, { params }) {
-  const token = cookies().get('auth_token')?.value
+  const token = (await cookies()).get('auth_token')?.value
   const isAuthed = Boolean(token)
-  const headers = { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  const headers = { Accept: 'application/json',...(token ? { Authorization: `Bearer ${token}` } : {})  }
 
   const fetchOpts = isAuthed
     ? { headers, cache: 'no-store' }

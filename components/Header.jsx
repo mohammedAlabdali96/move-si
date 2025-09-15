@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 
-export default function Header() {
-  const jar = cookies()
+export default async function Header() {
+  const jar = await cookies()
   const isAuthed = !!jar.get('auth_token')?.value
   const username = jar.get('username')?.value
 
@@ -11,7 +11,8 @@ export default function Header() {
       <Link href="/" className="font-semibold">🎬 Movie Discovery</Link>
 
       {isAuthed ? (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <Link href="/favorites" className="underline">My Favorites</Link>
           <span className="text-sm">Hi, {username}</span>
           <form method="post" action="/api/auth/logout?redirect=/">
             <button className="underline">Logout</button>
