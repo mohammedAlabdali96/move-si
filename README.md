@@ -12,30 +12,36 @@ npm install
 npm run dev
 # open http://localhost:3000
 
-Pages
+```
 
-/ — movie list with pagination
+## Pages
 
-/movies/[id-slug] — movie detail
+``` / ```— movie list with pagination
 
-/login — login form
+``` /movies/[id-slug] ``` — movie detail
 
-/favorites — your favorite movies (client pagination)
+``` /login ``` — login form
 
-How It Works
+``` /favorites ``` — your favorite movies (client pagination)
 
-BFF layer: pages call our own routes in app/api/*.
-The BFF talks to the real API and adds Authorization: Bearer <token> from cookies.
 
-SSR first: list and detail render on the server for fast first load.
+---
 
-Favorites: optimistic toggle button → POST /api/movies/:id/favorite (add/remove).
+## How It Works
+
+- BFF layer: pages call our own routes in app/api/*.
+- The BFF talks to the real API and adds Authorization: Bearer <token> from cookies.
+
+- SSR first: list and detail render on the server for fast first load.
+
+- Favorites: optimistic toggle button → POST /api/movies/:id/favorite (add/remove).
 
 Caching: guests get s-maxage=60, stale-while-revalidate=300; logged-in users get no-store.
 
-SEO
+---
 
-Pretty URLs like /movies/123-the-godfather
+## SEO
 
-Wrong slug → redirect to the canonical one
+- Pretty URLs like ``` /movies/123-the-godfather ```
 
+- Wrong slug → redirect to the canonical one
