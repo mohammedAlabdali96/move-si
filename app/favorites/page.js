@@ -1,47 +1,43 @@
-import Link from 'next/link'
-import { headers, cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import FavoritesGrid from '@/components/FavoritesGrid'
+// app/favorites/page.js
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import FavoritesGrid from "@/components/FavoritesGrid";
+import { apiGetJson } from "@/lib/bff"; // builds absolute URL + forwards cookies
 
 export const metadata = {
-  title: 'My Favorites · Movie Discovery',
-  robots: { index: false, follow: false }
-}
+  title: "My Favorites · Movie Discovery",
+  robots: { index: false, follow: false },
+};
 
-// Build absolute URL to our BFF + forward cookies
-async function bffFetchJson(path) {
-  const h = await headers()
-  const host = h.get('host')
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
-  const url = `${protocol}://${host}${path}`
-  const res = await fetch(url, {
-    cache: 'no-store',
-    headers: { cookie: h.get('cookie') ?? '' } // forward auth cookie
-  })
-  if (!res.ok) throw new Error(`BFF ${path} failed ${res.status}`)
-  return res.json()
-}
+const PAGE_SIZE = 8;
 
 export default async function FavoritesPage() {
-  const jar = await cookies()
-  if (!jar.get('auth_token')) redirect('/login?next=/favorites')
+  // require login
+  if (!(await cookies()).get("auth_token")) {
+    redirect("/login?next=/favorites");
+  }
 
-  // Get page 1 to learn total pages
-  const first = await bffFetchJson('/api/movies?page=1&limit=8')
-  const totalPages = Math.max(1, Number(first?.pagination?.totalPages || 1))
+  // 1) first page → learn total pages
+  const first = await apiGetJson(`/api/movies?page=1&limit=${PAGE_SIZE}`, {
+    cache: "no-store",
+  });
+  const totalPages = Math.max(1, Number(first?.pagination?.totalPages || 1));
 
-  // Fetch the rest in parallel
-  const rest = await Promise.all(
-    Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) =>
-      bffFetchJson(`/api/movies?page=${i + 2}&limit=8`)
-    )
-  )
+  // 2) fetch remaining pages (simple & safe)
+  const results = [first];
+  for (let p = 2; p <= totalPages; p++) {
+    results.push(
+      await apiGetJson(`/api/movies?page=${p}&limit=${PAGE_SIZE}`, {
+        cache: "no-store",
+      })
+    );
+  }
 
-  const allMovies = [first, ...rest].flatMap(d => d?.movies || [])
-  const favorites = allMovies.filter(m => m.favorite)
-
-
-  const isAuthed = true
+  // 3) keep only favorites
+  const favorites = results
+    .flatMap((d) => d?.movies || [])
+    .filter((m) => m.favorite);
 
   return (
     <>
@@ -49,11 +45,16 @@ export default async function FavoritesPage() {
         <h1 className="text-2xl font-semibold">My Favorites</h1>
       </div>
 
-      {!favorites.length ? (
+      {favorites.length === 0 ? (
         <p>No favorites yet.</p>
       ) : (
-        <FavoritesGrid movies={favorites} isAuthed={isAuthed} pageSize={8} redirectPath="/favorites" />
+        <FavoritesGrid
+          movies={favorites}
+          isAuthed={true}
+          pageSize={PAGE_SIZE}
+          redirectPath="/favorites"
+        />
       )}
     </>
-  )
+  );
 }

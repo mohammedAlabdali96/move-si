@@ -1,13 +1,11 @@
-// app/layout.js
-import './globals.css'
+import "./globals.css";
 
-import Header from '@/components/Header'
-// import Header from '../components/Header'
+import Header from "@/components/Header";
 
 export const metadata = {
-  title: 'Movie Discovery',
-  description: 'Next.js app with SSR browsing'
-}
+  title: "Movie Discovery",
+  description: "Next.js app with SSR browsing",
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -17,5 +15,5 @@ export default function RootLayout({ children }) {
         <main className="max-w-6xl mx-auto p-6">{children}</main>
       </body>
     </html>
-  )
+  );
 }
