@@ -34,7 +34,7 @@ export default async function Header() {
         ) : (
           <Link
             href="/login"
-            className="text-sm rounded-full border px-3 py-1.5 hover:bg-neutral-50"
+            className="text-sm rounded-full border px-3 py-1.5 text-neutral-800 hover:bg-neutral-50"
           >
             Login
           </Link>

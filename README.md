@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🎬 Movie Discovery
+
+Small **Next.js (App Router)** app to browse movies, see details, log in, and save favorites.  
+Server-first, clean UI, and fast.
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# open http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Pages
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+/ — movie list with pagination
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+/movies/[id-slug] — movie detail
 
-## Learn More
+/login — login form
 
-To learn more about Next.js, take a look at the following resources:
+/favorites — your favorite movies (client pagination)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+How It Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+BFF layer: pages call our own routes in app/api/*.
+The BFF talks to the real API and adds Authorization: Bearer <token> from cookies.
 
-## Deploy on Vercel
+SSR first: list and detail render on the server for fast first load.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Favorites: optimistic toggle button → POST /api/movies/:id/favorite (add/remove).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Caching: guests get s-maxage=60, stale-while-revalidate=300; logged-in users get no-store.
+
+SEO
+
+Pretty URLs like /movies/123-the-godfather
+
+Wrong slug → redirect to the canonical one
+
