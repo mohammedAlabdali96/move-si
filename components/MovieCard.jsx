@@ -1,6 +1,5 @@
 // components/MovieCard.jsx
 "use client";
-
 import Link from "next/link";
 import { slugify } from "@/lib/slugify";
 import FavoriteButton from "@/components/FavoriteButton";

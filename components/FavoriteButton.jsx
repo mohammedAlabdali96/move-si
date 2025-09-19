@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 function HeartIcon({ filled }) {
@@ -42,15 +42,15 @@ export default function FavoriteButton({
   }
 
   const [fav, setFav] = useState(Boolean(initialFavorite));
-  const inflight = useRef(false);
+  const [pending, setPending] = useState(false);
 
   async function onSubmit(e) {
     e.preventDefault();
-    if (inflight.current) return;
+    if (pending) return;
 
     const target = !fav;
     setFav(target);
-    inflight.current = true;
+    setPending(true);
 
     try {
       const url = `/api/movies/${movieId}/favorite${
@@ -61,7 +61,7 @@ export default function FavoriteButton({
     } catch {
       setFav(!target);
     } finally {
-      inflight.current = false;
+      setPending(false);
     }
   }
 
@@ -74,14 +74,14 @@ export default function FavoriteButton({
     <form method="post" action={action} onSubmit={onSubmit} className="mt-3">
       <button
         aria-pressed={fav}
-        disabled={inflight.current}
+        aria-busy={pending}
+        disabled={pending}
         className={[
           "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium",
           "transition-colors duration-150",
           fav
             ? "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
             : "border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-50",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
           "disabled:opacity-60 disabled:cursor-not-allowed",
         ].join(" ")}
       >
